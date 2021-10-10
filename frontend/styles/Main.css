@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@300;400&family=Noto+Sans+Mono:wght@300;400&family=Roboto:wght@300;400&display=swap');
+
+* {
+    /* font-family: 'Noto Sans Display', sans-serif; */
+    font-family: 'Noto Sans Mono', monospace;
+    font-family: 'Roboto', sans-serif;
+    font: 'Roboto';
+}
+
+.header {
+    display: inline-block;
+}
+
+.side {
+    display: inline-block;
+    min-width: 50%;
+    min-height: 10vh;
+}
+
+.header-logo {
+    position: absolute !important;
+    margin-top: 7px !important;
+    margin-bottom: 20px !important;
+}
+
+div {
+    overflow: visible !important;
+}
