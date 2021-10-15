@@ -3,6 +3,7 @@ import Head from "next/head"
 import IconLink from "../components/iconLink"
 import { AiOutlineUser } from "@react-icons/all-files/ai/AiOutlineUser"
 import { IoHelp } from "@react-icons/all-files/io5/IoHelp"
+import { AiOutlineArrowUp } from "@react-icons/all-files/ai/AiOutlineArrowUp"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -13,15 +14,11 @@ interface State {
 
 }
 
-const iconLinkStyle = {
-
-}
-
 const iconStyle: React.CSSProperties = {
 	display: "inline-flex",
 	margin: "1px 4px",
-	width: "1em",
-	height: "1em"
+	minWidth: "1em",
+	minHeight: "1em"
 }
 
 export default class index extends Component<Props, State> {
@@ -49,6 +46,10 @@ export default class index extends Component<Props, State> {
 
 						<Link href="/help" passHref>
 							<IconLink text="Help"><IoHelp style={iconStyle} /></IconLink>
+						</Link>
+
+						<Link href="/app" passHref>
+							<IconLink text="Access"><AiOutlineArrowUp style={iconStyle} /></IconLink>
 						</Link>
 
 					</div>
