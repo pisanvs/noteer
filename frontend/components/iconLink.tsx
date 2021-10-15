@@ -2,6 +2,7 @@ import React, { ReactElement } from "react"
 
 interface Props {
     text: string;
+    href?: string;
 }
 
 const style: React.CSSProperties = {
@@ -14,7 +15,7 @@ const style: React.CSSProperties = {
 export default function iconLink (props: React.PropsWithChildren<Props>) {
     return (
         <div className="icon-link" style={style}>
-            {props.children}{' '}<span className="il-text">{props.text}</span>
+            {props.children}{' '}<a className="il-text" href={props.href}>{props.text}</a>
         </div>
     )
 }

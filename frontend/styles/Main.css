@@ -7,8 +7,18 @@
     font: 'Roboto';
 }
 
+div {
+    overflow: visible !important;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
 .header {
-    display: inline-block;
+    display: flex;
+    width: 100%;
 }
 
 .side {
@@ -17,12 +27,17 @@
     min-height: 10vh;
 }
 
+.side-right {
+    display: flex;
+    justify-content: right;
+}
+
+.side-left {
+    display: inline-block;
+}
+
 .header-logo {
     position: absolute !important;
     margin-top: 7px !important;
     margin-bottom: 20px !important;
-}
-
-div {
-    overflow: visible !important;
 }

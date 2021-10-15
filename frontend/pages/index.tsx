@@ -4,6 +4,7 @@ import IconLink from "../components/iconLink"
 import { AiOutlineUser } from "@react-icons/all-files/ai/AiOutlineUser"
 import { IoHelp } from "@react-icons/all-files/io5/IoHelp"
 import Image from "next/image"
+import Link from "next/link"
 
 interface Props {
 
@@ -23,10 +24,6 @@ const iconStyle: React.CSSProperties = {
 	height: "1em"
 }
 
-const logoStyle: React.CSSProperties = {
-	margin: "10px 5px",
-}
-
 export default class index extends Component<Props, State> {
 	state = {}
 
@@ -38,12 +35,33 @@ export default class index extends Component<Props, State> {
 				</Head>
 				<header className="header">
 					<div className="side side-left">
-						<Image src="/placeholder-logo-1.svg" width="120" height="30" alt="logo" className="header-logo"/>
-						<IconLink text="Login"><AiOutlineUser style={iconStyle} /></IconLink>
-						<IconLink text="Help"><IoHelp style={iconStyle} /></IconLink>
-					</div>
-					<div className="side side-left">
+						<Image 
+							src="/placeholder-logo-1.svg"
+							width="120"
+							height="30"
+							alt="logo"
+							className="header-logo"
+						/>
 						
+						<Link href="/login" passHref>
+							<IconLink text="Login"><AiOutlineUser style={iconStyle} /></IconLink>
+						</Link>
+
+						<Link href="/help" passHref>
+							<IconLink text="Help"><IoHelp style={iconStyle} /></IconLink>
+						</Link>
+
+					</div>
+					<div className="side side-right">
+						<Link href="/register">
+							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties}>Register</a>
+						</Link>
+						<Link href="#about">
+							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties}>About Us</a>
+						</Link>
+						<Link href="https://github.com/pisanvs/noteer">
+							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties}>Github Repo</a>
+						</Link>
 					</div>
 				</header>
 				<div className="main container">
