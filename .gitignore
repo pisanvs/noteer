@@ -6,4 +6,5 @@ cache
 node_modules
 .env.local
 build
-volumes
+volumes/mongo
+volumes/proxy/certs
