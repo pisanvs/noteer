@@ -48,7 +48,7 @@ services:
       - "VIRTUAL_PATH=/"
       - "VIRTUAL_PORT=3000"
       - "LETSENCRYPT_HOST=${APP_DOMAIN}"
-      - "LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl"
+      - "LETSENCRYPT_EMAIL=you@example.com"
   
 networks:
   nginx-proxy:

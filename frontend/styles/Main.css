@@ -41,3 +41,53 @@ a {
     margin-top: 7px !important;
     margin-bottom: 20px !important;
 }
+
+.login-main {
+    display: grid;
+    margin: 0;
+    min-height: 100vh;
+    min-width: 50vw;
+}
+
+.login-form-wrapper {
+    min-height: 40vh;
+    min-width: 20vw;
+    display: grid;
+    margin: auto;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 40vh;
+}
+
+.login-input {
+    display: grid;
+    margin: auto;
+    border: 1px solid #bbb;
+    border-radius: 1px;
+}
+
+.register-main {
+    display: grid;
+    margin: 0;
+    min-height: 100vh;
+    min-width: 50vw;
+}
+
+.register-form-wrapper {
+    min-height: 40vh;
+    min-width: 20vw;
+    display: grid;
+    margin: auto;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 40vh;
+}
+
+.register-input {
+    display: grid;
+    margin: auto;
+    border: 1px solid #bbb;
+    border-radius: 1px;
+}
