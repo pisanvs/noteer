@@ -46,13 +46,48 @@ services:
       - "./frontend:/app"
     environment:
       - "VIRTUAL_HOST=${APP_DOMAIN}"
-      - "VIRTUAL_NETWORK=nginx-proxy"
       - "VIRTUAL_PATH=/"
+      - "VIRTUAL_NETWORK=nginx-proxy"
       - "VIRTUAL_PORT=3000"
       - "LETSENCRYPT_HOST=${APP_DOMAIN}"
       - "LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl"
-  
+  backend:
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: ./dev.Dockerfile
+    image: "noteer-dev-backend:b1"
+    volumes:
+      - "./backend:/app"
+    environment:
+      - "VIRTUAL_HOST=api.${APP_DOMAIN}"
+      - "VIRTUAL_PATH=/"
+      - "VIRTUAL_PORT=8000"
+      - "LETSENCRYPT_HOST=api.${APP_DOMAIN}"
+      - "LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl"
+    networks:
+      backend:
+        ipv4_address: 172.16.150.10
+      nginx-proxy:
+
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - "./volumes/mongo/data:/data/db"
+      - "./volumes/mongo/config:/data/configdb"
+    networks:
+      backend:
+        ipv4_address: 172.16.150.17
+
 networks:
   nginx-proxy:
     external: true
     name: nginx-proxy
+  backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.150.0/24
+          gateway: 172.16.150.1

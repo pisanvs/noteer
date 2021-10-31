@@ -55,13 +55,13 @@ export default class index extends Component<Props, State> {
 					</div>
 					<div className="side side-right">
 						<Link href="/register">
-							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties}>Register</a>
+							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties} className="link">Register</a>
 						</Link>
 						<Link href="#about">
-							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties}>About Us</a>
+							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties} className="link">About Us</a>
 						</Link>
 						<Link href="https://github.com/pisanvs/noteer">
-							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties}>Github Repo</a>
+							<a style={{margin: "12px 10px", fontWeight:300} as React.CSSProperties} className="link">Github Repo</a>
 						</Link>
 					</div>
 				</header>
