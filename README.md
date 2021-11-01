@@ -6,7 +6,7 @@ oh you wanna know what it is? well, its just a notes app with some cool features
 
 what else do i say?
 
-ummm... i guess you can look into the code and help me but its probably better if u dont
+ummm... i guess you can look into the code and help me but its ~~probably better if u dont~~actually do, i need help
 
 ## How to set up a local instance
 
