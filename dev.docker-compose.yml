@@ -4,6 +4,8 @@ services:
   nginx:
     restart: unless-stopped
     image: nginx
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
     container_name: nginx
     ports:
       - "80:80"
@@ -13,6 +15,7 @@ services:
       - "/etc/nginx/vhost.d"
       - "/usr/share/nginx/html"
       - "./volumes/proxy/certs:/etc/nginx/certs:ro"
+    network_mode: host
 
   nginx-gen:
     restart: unless-stopped
@@ -36,6 +39,7 @@ services:
       - "./volumes/proxy/certs:/etc/nginx/certs:rw"
     environment:
       - NGINX_DOCKER_GEN_CONTAINER=nginx-gen
+      - NGINX_PROXY_CONTAINER=nginx
 
   web:
     restart: unless-stopped
@@ -45,47 +49,48 @@ services:
     volumes:
       - "./frontend:/app"
     environment:
-      - "VIRTUAL_HOST=${APP_DOMAIN}"
-      - "VIRTUAL_PATH=/"
-      - "VIRTUAL_NETWORK=nginx-proxy"
-      - "VIRTUAL_PORT=3000"
-      - "LETSENCRYPT_HOST=${APP_DOMAIN}"
-      - "LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl"
+      - VIRTUAL_HOST=${APP_DOMAIN}
+      - VIRTUAL_PATH=/
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=${APP_DOMAIN}
+      - LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl
+    networks:
+      - default
+      - nginx-proxy
   backend:
+    image: golang:alpine
     restart: unless-stopped
-    build:
-      context: ./backend
-      dockerfile: ./dev.Dockerfile
-    image: "noteer-dev-backend:b1"
+    entrypoint: ["/bin/sh", "-c", "cd /app && go run /app/src"]
     volumes:
       - "./backend:/app"
     environment:
-      - "VIRTUAL_HOST=api.${APP_DOMAIN}"
-      - "VIRTUAL_PATH=/"
-      - "VIRTUAL_PORT=8000"
-      - "LETSENCRYPT_HOST=api.${APP_DOMAIN}"
-      - "LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl"
+      - VIRTUAL_HOST=api.${APP_DOMAIN}
+      - VIRTUAL_PATH=/
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=api.${APP_DOMAIN}
+      - LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl
     networks:
-      backend:
-        ipv4_address: 172.16.150.10
-      nginx-proxy:
+      - default
+      - nginx-proxy
 
   mongodb:
     image: mongo:latest
     restart: unless-stopped
     volumes:
-      - "./volumes/mongo/data:/data/db"
-      - "./volumes/mongo/config:/data/configdb"
+      - mongodata:/data/db
     networks:
-      backend:
+      nginx-proxy:
         ipv4_address: 172.16.150.17
 
+volumes:
+  mongodata:
+
 networks:
+  default:
+    
   nginx-proxy:
-    external: true
-    name: nginx-proxy
-  backend:
     driver: bridge
+    name: nginx-proxy
     ipam:
       driver: default
       config:

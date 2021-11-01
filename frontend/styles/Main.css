@@ -57,7 +57,7 @@ a {
     justify-content: center;
     border: 1px solid #ddd;
     border-radius: 10px;
-    margin-bottom: 40vh;
+    margin-top: 20vh;
 }
 
 .login-input {
@@ -70,24 +70,40 @@ a {
 .register-main {
     display: grid;
     margin: 0;
-    min-height: 100vh;
-    min-width: 50vw;
+    min-height: 100%;
+    min-width: 50%;
 }
 
 .register-form-wrapper {
+    position: fixed;
+    top: 20vh;
+    left: 40vw;
     min-height: 40vh;
     min-width: 20vw;
     display: grid;
-    margin: auto;
+    margin: 0 auto;
+    align-items: center;
     justify-content: center;
     border: 1px solid #ddd;
     border-radius: 10px;
-    margin-bottom: 40vh;
+    box-sizing: inherit;
 }
 
 .register-input {
+    min-width: 12vw;
+    min-height: 30px;
+    font-size: medium;
     display: grid;
     margin: auto;
     border: 1px solid #bbb;
     border-radius: 1px;
+}
+
+.register-error {
+    margin-top: 10px;
+    font-size: small;
+    margin: auto;
+    border: 1px solid rgba(211, 57, 46, 0.5);
+    border-radius: 1px;
+    z-index: 10;
 }
