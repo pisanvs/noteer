@@ -16,7 +16,7 @@ export default class index extends Component<Props, State> {
     }
 
     componentDidMount() {
-        const authCookie = cookie.get("auth")
+        const authCookie = cookie.get("sesh")
         
         if (authCookie == undefined) {
             Router.push('/login')

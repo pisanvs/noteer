@@ -17,7 +17,7 @@ export default class login extends Component<Props, State> {
 
                     <h2 style={{justifySelf: 'center'}}>Login</h2>
 
-                    <form action="noteer.local/api/v1/auth/login" method="post">
+                    <form action="https://api.noteer.local/api/v1/auth/login" method="POST">
                         <label htmlFor="username">Username:</label>
                         <br />
                         <input type="text" name="username" id="username" className="login-input"/>

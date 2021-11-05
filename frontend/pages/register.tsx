@@ -51,7 +51,7 @@ export default class register extends Component<Props, State> {
 
                     <h2 style={{ justifySelf: 'center' }}>Register</h2>
 
-                    <form action="http://api.noteer.local/api/v1/auth/register" method="post">
+                    <form action="https://api.noteer.local/api/v1/auth/register" method="POST">
                         <label htmlFor="name">Name:</label>
                         <br />
                         <input type="text" name="name" id="name" className="register-input" />

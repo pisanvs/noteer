@@ -4,8 +4,8 @@ services:
   nginx:
     restart: unless-stopped
     image: nginx
-    labels:
-      # com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    # labels:
+    #   com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
     container_name: nginx
     ports:
       - "80:80"
@@ -53,7 +53,7 @@ services:
       - VIRTUAL_PATH=/
       - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=${APP_DOMAIN}
-      - LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl
+      - LETSENCRYPT_EMAIL=${WEBMASTER_EMAIL}
     networks:
       - default
       - nginx-proxy
@@ -68,7 +68,10 @@ services:
       - VIRTUAL_PATH=/
       - VIRTUAL_PORT=8000
       - LETSENCRYPT_HOST=api.${APP_DOMAIN}
-      - LETSENCRYPT_EMAIL=maxmorel@pisanvs.cl
+      - LETSENCRYPT_EMAIL=${WEBMASTER_EMAIL}
+      - SECURECOOKIE_HASH=${SECURECOOKIE_HASH}
+      - SECURECOOKIE_BLOCK=${SECURECOOKIE_BLOCK}
+      - MAIN_DOMAIN=${APP_DOMAIN}
     networks:
       - default
       - nginx-proxy
