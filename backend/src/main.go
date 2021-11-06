@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/sha512"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -47,12 +48,12 @@ type LoginForm struct {
 }
 
 type DBUser struct {
-	username     string `validate:"required,printascii "`
-	password     string `validate:"required,printascii"`
-	name         string `validate:"required,alpha"`
-	email        string `validate:"required,email"`
-	creationDate time.Time
-	lastLogin    time.Time
+	Username     string `validate:"required,printascii "`
+	Password     string `validate:"required,printascii"`
+	Name         string `validate:"required,alpha"`
+	Email        string `validate:"required,email"`
+	CreationDate time.Time
+	LastLogin    time.Time
 }
 
 // type User struct {
@@ -65,10 +66,10 @@ type DBUser struct {
 // }
 
 type DBSession struct {
-	sessionID string
-	username  string
-	created   time.Time
-	expires   time.Time
+	SessionID string
+	Username  string
+	Created   time.Time
+	Expires   time.Time
 }
 
 // VARIABLES
@@ -81,7 +82,7 @@ var usersDB *mongo.Collection
 
 var validate *validator.Validate
 
-var secureCookie *securecookie.SecureCookie
+var sc *securecookie.SecureCookie
 
 // hash password using bcrypt
 func hashPassword(password string) (string, error) {
@@ -100,7 +101,7 @@ func main() {
 	hashKey := os.Getenv("SECURECOOKIE_HASH")
 	blockKey := os.Getenv("SECURECOOKIE_BLOCK")
 
-	secureCookie = securecookie.New([]byte(hashKey), []byte(blockKey))
+	sc = securecookie.New([]byte(hashKey), []byte(blockKey))
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://172.16.150.17:27017/?readPreference=primary&connect=direct&sslInsecure=true"))
 	if err != nil {
@@ -118,9 +119,11 @@ func main() {
 	fmt.Println(client.ListDatabaseNames(ctx, bson.M{}))
 
 	mainMux := mux.NewRouter().StrictSlash(true)
-	mainMux.HandleFunc(apiRoot+"/auth/session", session)
+	mainMux.HandleFunc(apiRoot+"/auth/session", session).Methods("GET", "OPTIONS", "POST")
 	mainMux.HandleFunc(apiRoot+"/auth/login", login)
 	mainMux.HandleFunc(apiRoot+"/auth/register", register)
+
+	mainMux.Use(mux.CORSMethodMiddleware(mainMux))
 
 	log.Fatal(http.ListenAndServe(":8000", mainMux))
 }
@@ -128,34 +131,52 @@ func main() {
 // START AUTH ROUTES
 
 func session(w http.ResponseWriter, r *http.Request) {
-	authToken := r.Header["Authorization"][0]
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization")
 
-	var result bson.M
-	err := sessionsDB.FindOne(context.TODO(), bson.M{"sessionID": authToken}).Decode(&result)
+	if r.Method == http.MethodOptions {
+		return
+	}
+
+	// decode session cookie
+	var session [64]byte
+	auth := r.Header.Get("Authorization")
+	err := sc.Decode("session", auth, &session)
 	if err != nil {
-		w.WriteHeader(401)
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// get session from db
+	var result bson.M
+	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": hex.EncodeToString(session[:])}).Decode(&result)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(err.Error()))
 		fmt.Print(err)
 	}
 
 	response, err := json.Marshal(result)
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("JSON marshal error: " + err.Error()))
 		return
 	}
-	w.Write(response)
+	w.Write([]byte(string(response)))
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
 	// check if method is POST
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("Wrong method, use POST for login endpoint"))
 		return
 	}
 
 	// check if body is empty
 	if r.Body == nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Empty request, try again"))
 		return
 	}
@@ -169,7 +190,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	// validate form
 	err := validate.Struct(form)
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Validation of data failed" + err.Error()))
 	}
 
@@ -180,15 +201,15 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("User: ")
 	fmt.Println(user)
 	if err != nil {
-		w.WriteHeader(401)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("User does not exist. Error: " + err.Error()))
 		return
 	}
 
 	// check if password is correct
-	err = bcrypt.CompareHashAndPassword([]byte(user.password), []byte(form.password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.password))
 	if err != nil {
-		w.WriteHeader(401)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Wrong password. Error:" + err.Error()))
 		return
 	}
@@ -199,24 +220,24 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	// create session document
 	session := DBSession{
-		sessionID: string(sessionID[:]),
-		username:  form.username,
-		created:   time.Now(),
-		expires:   time.Now().Add(time.Hour * 24 * 7),
+		SessionID: hex.EncodeToString(sessionID[:]),
+		Username:  form.username,
+		Created:   time.Now(),
+		Expires:   time.Now().Add(time.Hour * 24 * 7),
 	}
 
 	// insert session document
-	_, err = sessionsDB.InsertOne(context.TODO(), session)
+	_, err = sessionsDB.InsertOne(ctx, session)
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Error creating session"))
 		return
 	}
 
 	// send encrypted session cookie
-	encoded, err := secureCookie.Encode("session", sessionID)
+	encoded, err := sc.Encode("session", sessionID)
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Error encrypting session, try again"))
 		return
 	}
@@ -227,24 +248,26 @@ func login(w http.ResponseWriter, r *http.Request) {
 		Value:    encoded,
 		Path:     "/",
 		HttpOnly: false,
+		Secure:   true,
 		Domain:   "." + os.Getenv("MAIN_DOMAIN"),
 		Expires:  time.Now().Add(time.Hour * 24 * 7),
 	}
 	http.SetCookie(w, &cookie)
 
+	http.Redirect(w, r, "https://"+os.Getenv("MAIN_DOMAIN")+"/app", http.StatusFound)
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
 	// check if method is POST
 	if r.Method != "POST" {
-		w.WriteHeader(405)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("Wrong method, use POST for register endpoint"))
 		return
 	}
 
 	// check if body is empty
 	if r.Body == nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Empty request, try again"))
 		return
 	}
@@ -260,7 +283,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	// Validate form
 	err := validate.Struct(form)
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Validation of data Failed"))
 		return
 	}
@@ -272,7 +295,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		fmt.Print(err)
 	}
 	if result != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Username already exists"))
 		return
 	}
@@ -280,24 +303,24 @@ func register(w http.ResponseWriter, r *http.Request) {
 	// Hash password
 	hashedPass, err := hashPassword(form.password)
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Error hashing password. Please try again, if it still doesn't work, submit an issue on Github"))
 		return
 	}
 
 	// Create new user
 	newUser := DBUser{
-		username:     form.username,
-		password:     hashedPass,
-		name:         form.name,
-		email:        form.email,
-		creationDate: time.Now(),
-		lastLogin:    time.Now(),
+		Username:     form.username,
+		Password:     hashedPass,
+		Name:         form.name,
+		Email:        form.email,
+		CreationDate: time.Now(),
+		LastLogin:    time.Now(),
 	}
 
-	usersDB.InsertOne(ctx, bson.M{"username": newUser.username, "password": newUser.password, "name": newUser.name, "email": newUser.email, "creationDate": newUser.creationDate, "lastLogin": newUser.lastLogin})
+	usersDB.InsertOne(ctx, bson.M{"username": newUser.Username, "password": newUser.Password, "name": newUser.Name, "email": newUser.Email, "creationDate": newUser.CreationDate, "lastLogin": newUser.LastLogin})
 
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User created"))
 
 }

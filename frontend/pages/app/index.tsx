@@ -29,7 +29,7 @@ export default class index extends Component<Props, State> {
             }
         }
 
-        fetch('api.noteer.local/api/auth/v1/session', options).then(e => {
+        fetch('https://api.noteer.local/api/v1/auth/session', options).then(e => {
             e.text().then(ee => {
                 this.setState({
                     ...this.state,
