@@ -131,6 +131,7 @@ func main() {
 // START AUTH ROUTES
 
 func session(w http.ResponseWriter, r *http.Request) {
+	// TODO: CORS CONFIGURATION
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Authorization")
 

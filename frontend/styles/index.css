@@ -1,0 +1,43 @@
+:root {
+    /* declare colors */
+    --light: #ebebeb;
+    --dark: #2d2e2f;
+    --green: #23db94;
+    --green-accent: #0ecf5b;
+    --red: #cd4a4a;
+    --red-accent: #c72e2e;
+    --blue: #60c0de;
+    --blue-accent: #1174ac;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#type-b {
+    overflow: visible;
+    font-family: "Noto Sans Mono", monospace;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 50px;
+    line-height: 56px;
+
+    /* identical to box height */
+    text-align: center;
+
+    color: #000000;
+}
+
+.typed-cursor {
+    font-family: monospace;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 62px;
+    line-height: 56px;
+
+    /* identical to box height */
+    text-align: center;
+
+    color: #000000;
+}
