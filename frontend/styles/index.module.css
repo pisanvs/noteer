@@ -1,23 +1,56 @@
+/*
+ Copyright (C) 2021  Maximiliano Morel (pisanvs) <maxmorel@pisanvs.cl>
+
+ This file is part of Noteer, a note taking application.
+ 
+ Noteer is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License v3 as
+ published by the Free Software Foundation
+
+ Noteer is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Noteer.  If not, see <https://www.gnu.org/licenses/>.
+
+
+ @license GPL-3.0 <https://www.gnu.org/licenses/gpl-3.0.txt>
+*/
+
+
 /* ===== DECLARATIONS ==== */
 
 .title {
     font-family: Roboto;
     font-style: normal;
-    font-weight: 500;
-    font-size: 72px;
+    font-weight: 600;
+    font-size: 96px;
     line-height: 112px;
 
-    color: #000000;
+    color: var(--m1);
+}
+
+.subtitle {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 75px;
+    text-align: center;
+
+    color: var(--m1);
 }
 
 .text-bold {
     font-family: Roboto;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 22px;
     line-height: 26px;
 
-    color: #000000;
+    color: var(--m1);
 }
 
 .text-normal {
@@ -25,33 +58,61 @@
     font-style: normal;
     font-weight: 300;
     font-size: 20px;
-    line-height: 23px;
+    line-height: 23.44px;
 
-    color: #000000;
+    color: var(--m1);
 }
 /* ====== CONTAINER ====== */
 
 .container {
-  max-width: 90vw;
+  max-width: 95vw;
   margin: 0 auto;
+}
+
+.dark::after {
+    --bg: #1a1d24;
+    --m1: #ebebeb;
+    --m2: #2d2e2f;
+    --green: #23db94;
+    --green-accent: #0ecf5b;
+    --red: #cd4a4a;
+    --red-accent: #c72e2e;
+    --blue: #60c0de;
+    --blue-accent: #1174ac;
+    transition: color 1s ease-in-out, background-color 1s ease-in-out !important;
+}
+
+.light::after {
+    --bg: #ffffff;
+    --m1: #2d2e2f;
+    --m2: #ebebeb;
+    --green: #23db94;
+    --green-accent: #0ecf5b;
+    --red: #cd4a4a;
+    --red-accent: #c72e2e;
+    --blue: #60c0de;
+    --blue-accent: #1174ac;
+    transition: color 1s ease-in-out, background-color 1s ease-in-out !important;
 }
 
 /* ====== NAV HEADER ===== */
 
 .logo {
-    width: 242px;
-    margin-right: 3px;
+    width: 260px;
+    margin-right: 16px;
     /* height: 7.12vw; */
+    margin-left: 10px;
+    color: var(--m1);
 }
 
 .nav-boldlink {
     font-family: Roboto;
     font-style: normal;
-    font-weight: normal;
-    font-size: 35px;
+    font-weight: 500;
+    font-size: 36px;
     line-height: 42px;
 
-    color: #000000;
+    color: var(--m1);
     
 }
 
@@ -59,15 +120,15 @@
     font-family: Roboto;
     font-style: normal;
     font-weight: 300;
-    font-size: 35px;
+    font-size: 36px;
     line-height: 42px;
 
     /* identical to box height */
     text-align: right;
 
-    color: #000000;
+    color: var(--m1);
 
-    margin: 0 1.5vw;
+    margin: 0 2vw;
 }
 
 .nav-icon {
@@ -79,6 +140,7 @@
     padding-top: 0.3em;
     min-width: 2em;
     min-height: 2em;
+    color: var(--m1);
 }
 
 .icon-link {
@@ -93,7 +155,7 @@
     align-items: center;
     padding: 0.5em;
     min-width: 100%;
-    margin-top: 10px;
+    margin-top: 17px;
 }
 
 .header-left {
@@ -119,6 +181,14 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 3px;
+    margin-right: 4.3em;
+}
+
+.modeswitch {
+    height: 3.5em;
+    width: 3.5em;
+    color: var(--m1);
 }
 
 /* ======= CONTENT ======= */
@@ -142,6 +212,7 @@
 
 .content-right-bottom {
     display: grid;
+    margin-top: 2em;
 }
 
 .content-top {
@@ -152,17 +223,32 @@
     padding: 0.5em;
     min-width: 100%;
     padding-top: 4em;
-    max-width: 90vw;
+    max-width: 95vw;
+}
+
+.content-bottom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+    min-width: 100%;
+    max-width: 95vw;
+
+
+    min-width: 100%;
+    margin-top: 1em;
 }
 
 .devices-image {
     width: 1100px;
 }
 
-.code {
+.code-title {
     display: inline-block;
-    max-height: 3.5em;
-    background-color: var(--light);
+    /* max-height: 3.5em; */
+    background-color: var(--m2) !important;
+    min-height: 100px;
     border-radius: 3px;
     padding: 4px 8px;
     box-shadow: 0px 8px 20px -5px rgba(0, 0, 0, 0.25);
@@ -207,10 +293,10 @@
 }
 
 .tryit {
-    margin-top: 2em;
+    margin-top: 2.5em;
     padding-left: 5.5em;
 }
 
 .tryit-sh {
-    margin-left: 9em;
+    margin-left: 5em;
 }
