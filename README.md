@@ -56,3 +56,8 @@ sudo sh -c 'echo "*\tnoteer.local" >> ./hosts.ignore'
 sudo sed s/*/$(sudo docker inspect nginx | jq -M ".[].NetworkSettings.Networks.noteer_default.IPAddress" | tr -d "\"")/g hosts.ignore | sudo tee /etc/hosts
 ```
 
+## License
+
+ALL CODE IN THIS PROJECT, UNLESS **EXPLICITLY**[^1] STATED, IS LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3.
+
+[^1]: (Definition 1a) https://www.merriam-webster.com/dictionary/explicit 
