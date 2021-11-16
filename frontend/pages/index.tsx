@@ -28,6 +28,7 @@ import { AiOutlineUser } from "@react-icons/all-files/ai/AiOutlineUser";
 import { IoHelp } from "@react-icons/all-files/io5/IoHelp";
 import { AiOutlineArrowUp } from "@react-icons/all-files/ai/AiOutlineArrowUp";
 import { BsMoon } from "@react-icons/all-files/bs/BsMoon";
+import { FiSun } from "@react-icons/all-files/fi/FiSun";
 
 import Head from "next/head";
 import Link from "next/link";
@@ -116,7 +117,13 @@ export default class index extends Component<Props, State> {
                 <Link href="https://github.com/pisanvs/noteer">
                   <a className={styles["nav-thinlink"]}>Github Repo</a>
                 </Link>
-                <BsMoon className={styles["modeswitch"]} onClick={this.lightSwitch}></BsMoon>
+                {
+                  this.state.mode === "light" ? (
+                    <BsMoon className={styles["modeswitch"]} onClick={this.lightSwitch}></BsMoon>
+                  ) : (
+                    <FiSun className={styles["modeswitch"]} onClick={this.lightSwitch}></FiSun>
+                  )
+                }
               </div>
             </div>
           </div>

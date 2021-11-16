@@ -20,6 +20,7 @@
 */
 
 import React, { Component } from 'react'
+import '../../styles/app.module.css'
 import Router from 'next/router'
 import cookie from 'js-cookie'
 
@@ -63,7 +64,7 @@ export default class index extends Component<Props, State> {
     render() {
         return (
             <div>
-                {this.state.apiData}
+                
             </div>
         )
     }
