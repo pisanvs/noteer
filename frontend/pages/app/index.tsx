@@ -64,7 +64,7 @@ export default class index extends Component<Props, State> {
     render() {
         return (
             <div>
-                
+                {this.state.apiData}
             </div>
         )
     }

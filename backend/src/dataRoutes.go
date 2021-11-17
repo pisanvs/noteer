@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,18 +26,18 @@ func user(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode session cookie
-	var session [64]byte
-	auth := r.Header.Get("Authorization")
-	err := sc.Decode("session", auth, &session)
+	var seshBytes [64]byte
+	err := sc.Decode("session", r.Header.Get("Authorization"), &seshBytes)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error decoding session"))
+		fmt.Println(err)
 		return
 	}
 
 	// get session from db
 	var dbsesh DBSession
-	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": session}).Decode(&dbsesh)
+	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": hex.EncodeToString(seshBytes[:])}).Decode(&dbsesh)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error getting session, try logging in again"))
@@ -86,18 +87,18 @@ func newDoc(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode session cookie
-	var session [64]byte
-	auth := r.Header.Get("Authorization")
-	err := sc.Decode("session", auth, &session)
+	var seshBytes [64]byte
+	err := sc.Decode("session", r.Header.Get("Authorization"), &seshBytes)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error decoding session"))
+		fmt.Println(err)
 		return
 	}
 
 	// get session from db
 	var dbsesh DBSession
-	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": session}).Decode(&dbsesh)
+	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": hex.EncodeToString(seshBytes[:])}).Decode(&dbsesh)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error getting session, try logging in again"))
@@ -141,20 +142,18 @@ func getDoc(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode session cookie
-	var session [64]byte
-	auth := r.Header.Get("Authorization")
-	err := sc.Decode("session", auth, &session)
+	var seshBytes [64]byte
+	err := sc.Decode("session", r.Header.Get("Authorization"), &seshBytes)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error decoding session"))
+		fmt.Println(err)
 		return
 	}
 
 	// get session from db
 	var dbsesh DBSession
-	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": session}).Decode(&dbsesh)
-	fmt.Println("session cookie " + auth)
-	fmt.Println("session username " + dbsesh.Username)
+	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": hex.EncodeToString(seshBytes[:])}).Decode(&dbsesh)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error getting session, try logging in again"))
@@ -171,7 +170,13 @@ func getDoc(w http.ResponseWriter, r *http.Request) {
 
 	// get doc from db
 	var doc Document
-	err = documentsDB.FindOne(ctx, bson.M{"_id": r.FormValue("id")}).Decode(&doc)
+	docid, err := primitive.ObjectIDFromHex(r.FormValue("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Error parsing id, please try again"))
+		return
+	}
+	err = documentsDB.FindOne(ctx, bson.M{"_id": docid}).Decode(&doc)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Error getting document"))
@@ -186,6 +191,9 @@ func getDoc(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return doc
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(doc.Content)
 
 }
 

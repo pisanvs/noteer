@@ -25,18 +25,18 @@ func session(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode session cookie
-	var session [64]byte
-	auth := r.Header.Get("Authorization")
-	err := sc.Decode("session", auth, &session)
+	var seshBytes [64]byte
+	err := sc.Decode("session", r.Header.Get("Authorization"), &seshBytes)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error decoding session"))
+		fmt.Println(err)
 		return
 	}
 
 	// get session from db
 	var dbsesh DBSession
-	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": session}).Decode(&dbsesh)
+	err = sessionsDB.FindOne(ctx, bson.M{"sessionid": hex.EncodeToString(seshBytes[:])}).Decode(&dbsesh)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Error getting session, try logging in again"))
@@ -91,9 +91,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 	// check if user exists
 	var user DBUser
 	err = usersDB.FindOne(ctx, bson.M{"username": form.username}).Decode(&user)
-	fmt.Println(err)
-	fmt.Print("User: ")
-	fmt.Println(user)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("User does not exist. Error: " + err.Error()))

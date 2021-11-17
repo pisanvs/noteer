@@ -111,5 +111,5 @@ func main() {
 
 	mainMux.Use(mux.CORSMethodMiddleware(mainMux))
 
-	log.Fatal(http.ListenAndServe(":8000", mainMux))
+	log.Fatal(http.ListenAndServe(":8888", mainMux))
 }
