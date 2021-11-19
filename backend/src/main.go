@@ -39,6 +39,8 @@ import (
 	"github.com/go-playground/validator/v10"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 // CONSTANTS
@@ -53,6 +55,8 @@ var sessionsDB *mongo.Collection
 var usersDB *mongo.Collection
 var userDataDB *mongo.Collection
 var documentsDB *mongo.Collection
+
+var dmp *diffmatchpatch.DiffMatchPatch
 
 var validate *validator.Validate
 
@@ -69,7 +73,11 @@ func hashPassword(password string) (string, error) {
 
 func main() {
 
+	// create validator instance
 	validate = validator.New()
+
+	// create diff match patch instance
+	dmp = diffmatchpatch.New()
 
 	// create securecookie instance
 	hashKey := os.Getenv("SECURECOOKIE_HASH")

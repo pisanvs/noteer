@@ -27,6 +27,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/sergi/go-diff v1.2.0
 	golang.org/x/crypto v0.0.0-20211115234514-b4de73f9ece8
 	golang.org/x/sys v0.0.0-20211116061358-0a5406a5449c // indirect
 )
