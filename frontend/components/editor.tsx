@@ -23,7 +23,9 @@ import Cookies from 'js-cookie';
 import Head from 'next/head'
 import React, { Component } from 'react'
 import { diff_match_patch } from 'diff-match-patch'
-import Showdown from 'showdown'
+import CodeMirror from 'react-codemirror'
+require('codemirror/lib/codemirror.css')
+require('codemirror/mode/markdown/markdown')
 
 import styles from '../styles/app.module.css'
 
@@ -31,19 +33,23 @@ interface Props {
     
 }
 interface State {
-    
+    text: string,
+    saved: boolean,
+    loaded: boolean,
 }
 
 export default class Editor extends Component<Props, State> {
-    editor: React.RefObject<HTMLDivElement>;
     pastEditorContent: string | undefined;
     id: React.RefObject<HTMLInputElement>;
 
     constructor(props: Props) {
-        super(props)
-        this.state = {}
+        super(props);
+        this.state = {
+            text: "",
+            saved: true,
+            loaded: false
+        };
 
-        this.editor = React.createRef();
         this.id = React.createRef();
     }
 
@@ -60,17 +66,17 @@ export default class Editor extends Component<Props, State> {
         fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
             d.text().then(e => {
                 this.pastEditorContent = e;
-                this.editor.current!.innerHTML = e;
+                this.setState({ text: e, saved: true, loaded: true });
             })
         })
-        this.pastEditorContent = this.editor.current?.innerHTML;
+        this.pastEditorContent = this.state.text;
         setInterval(() => {
-            if (this.editor.current?.innerHTML == this.pastEditorContent) {
+            if (this.state.text == this.pastEditorContent) {
                 return;
             } else {
                 this.sendEdits();
             }
-        }, 5000)
+        }, 2500)
     }
 
     setId = () => {
@@ -86,14 +92,14 @@ export default class Editor extends Component<Props, State> {
         fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
             d.text().then(e => {
                 this.pastEditorContent = e;
-                this.editor.current!.innerHTML = e;
+                this.setState({ text: e });
             })
         })
     }
 
     sendEdits = () => {
         let dmp = new diff_match_patch()
-        let prediff = dmp.diff_main(this.pastEditorContent!, this.editor.current!.innerHTML)
+        let prediff = dmp.diff_main(this.pastEditorContent!, this.state.text)
 
         let diff = dmp.patch_toText(dmp.patch_make(prediff))
 
@@ -108,11 +114,17 @@ export default class Editor extends Component<Props, State> {
 
         fetch("//api.noteer.local/api/v1/data/docs/edit", options).then(d => {
             if (d.status == 200) {
-                this.pastEditorContent = this.editor.current!.innerHTML;
+                this.pastEditorContent = this.state.text;
+                this.setState({ saved: true });
             } else {
                 this.sendEdits();
             }
         })
+    }
+
+
+    updateEditor = (newText: string) => {
+        this.setState({ text: newText, saved: false });
     }
 
     render() {
@@ -123,11 +135,17 @@ export default class Editor extends Component<Props, State> {
                 </Head>
 
                 <div className="content">
-                    <input type="text" name="id" id="id" ref={this.id} />
-                    <button onClick={this.setId}>Submit</button>
-                    <h1>Editor</h1>
-                    <div contentEditable ref={this.editor} className={styles.editor}></div>
-                    <button onClick={this.sendEdits}>submit changes</button>
+                    <div className="editor">
+                        {this.state.saved ? <p>Saved</p> : <p>Not Saved</p>}
+
+                        {
+                            this.state.loaded == false ?
+                                <div>Loading...</div>
+                                :
+                                <CodeMirror value={this.state.text} onChange={this.updateEditor} options={{lineNumbers: false, mode: "markdown", theme:"base16-light"}} />
+                        }
+                        <button onClick={this.sendEdits}>submit changes</button>
+                    </div>
                 </div>
             </>
         )

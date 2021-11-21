@@ -22,6 +22,8 @@
 import type { AppProps } from 'next/app'
 
 import "../styles/Main.css"
+import "../styles/codemirror.mod.css"
+import "../styles/base16-light.css"
 
 function MyApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />
