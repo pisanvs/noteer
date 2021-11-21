@@ -20,6 +20,7 @@
 */
 
 import React, { Component } from 'react'
+import Link from 'next/link'
 
 interface Props {
     
@@ -53,7 +54,7 @@ export default class login extends Component<Props, State> {
                         <br />
                         <input type="submit" name="submit" id="submit" value="Submit" className="login-input"/>
                     </form>
-                    <a href="/register" style={{color: "#1955c8", textDecoration: "underline"}}>Don&apos;t have an account?</a>
+                    <Link href="/register" passHref><a style={{color: "#1955c8", textDecoration: "underline"}}>Don&apos;t have an account?</a></Link>
                 </div>
             </div>
         )

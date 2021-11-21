@@ -22,10 +22,12 @@
 import Cookies from 'js-cookie';
 import Head from 'next/head'
 import React, { Component } from 'react'
+
+import { Controlled as CodeMirror } from 'react-codemirror2';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/markdown/markdown';
+
 import { diff_match_patch } from 'diff-match-patch'
-import CodeMirror from 'react-codemirror'
-require('codemirror/lib/codemirror.css')
-require('codemirror/mode/markdown/markdown')
 
 import styles from '../styles/app.module.css'
 
@@ -33,22 +35,19 @@ interface Props {
     
 }
 interface State {
-    text: string,
-    saved: boolean,
-    loaded: boolean,
+    text: string
 }
 
 export default class Editor extends Component<Props, State> {
     pastEditorContent: string | undefined;
     id: React.RefObject<HTMLInputElement>;
 
+
     constructor(props: Props) {
-        super(props);
+        super(props)
         this.state = {
-            text: "",
-            saved: true,
-            loaded: false
-        };
+            text: ""
+        }
 
         this.id = React.createRef();
     }
@@ -66,7 +65,7 @@ export default class Editor extends Component<Props, State> {
         fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
             d.text().then(e => {
                 this.pastEditorContent = e;
-                this.setState({ text: e, saved: true, loaded: true });
+                this.setState({ text: e });
             })
         })
         this.pastEditorContent = this.state.text;
@@ -76,7 +75,7 @@ export default class Editor extends Component<Props, State> {
             } else {
                 this.sendEdits();
             }
-        }, 2500)
+        }, 5000)
     }
 
     setId = () => {
@@ -115,16 +114,14 @@ export default class Editor extends Component<Props, State> {
         fetch("//api.noteer.local/api/v1/data/docs/edit", options).then(d => {
             if (d.status == 200) {
                 this.pastEditorContent = this.state.text;
-                this.setState({ saved: true });
             } else {
                 this.sendEdits();
             }
         })
     }
 
-
-    updateEditor = (newText: string) => {
-        this.setState({ text: newText, saved: false });
+    updateEditor = (e_: any, d_: any, newText: string) => {
+        this.setState({ text: newText });
     }
 
     render() {
@@ -135,17 +132,11 @@ export default class Editor extends Component<Props, State> {
                 </Head>
 
                 <div className="content">
-                    <div className="editor">
-                        {this.state.saved ? <p>Saved</p> : <p>Not Saved</p>}
-
-                        {
-                            this.state.loaded == false ?
-                                <div>Loading...</div>
-                                :
-                                <CodeMirror value={this.state.text} onChange={this.updateEditor} options={{lineNumbers: false, mode: "markdown", theme:"base16-light"}} />
-                        }
-                        <button onClick={this.sendEdits}>submit changes</button>
-                    </div>
+                    <input type="text" name="id" id="id" ref={this.id} />
+                    <button onClick={this.setId}>Submit</button>
+                    <h1>Editor</h1>
+                    <CodeMirror value={this.state.text} onBeforeChange={(e,d,v) => {}} onChange={this.updateEditor} options={{lineNumbers: false, mode: "markdown", theme:"base16-light"}} />
+                    <button onClick={this.sendEdits}>submit changes</button>
                 </div>
             </>
         )

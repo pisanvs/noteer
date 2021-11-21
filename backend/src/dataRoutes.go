@@ -143,6 +143,17 @@ func newDoc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// make document reference object
+	docRef := DocumentRef{
+		ID:           result.InsertedID.(primitive.ObjectID).String(),
+		Title:        r.FormValue("title"),
+		CreationDate: time.Now(),
+		LastModified: time.Now(),
+	}
+
+	// add document reference to user data
+	userDataDB.FindOneAndUpdate(ctx, bson.M{"username": dbsesh.Username}, bson.M{"$push": bson.M{"documents": docRef}})
+
 	// return success
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Document created succesfully, id: " + result.InsertedID.(primitive.ObjectID).Hex()))
