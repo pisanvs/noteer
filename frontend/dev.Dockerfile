@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:16-alpine
 
 WORKDIR /app
 
@@ -6,4 +6,4 @@ RUN yarn
 
 EXPOSE 3000
 
-CMD [ "yarn", "dev" ]
+ENTRYPOINT [ "yarn", "dev" ]

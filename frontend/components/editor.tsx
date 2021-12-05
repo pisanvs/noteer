@@ -23,122 +23,116 @@ import Cookies from 'js-cookie';
 import Head from 'next/head'
 import React, { Component } from 'react'
 
-import { Controlled as CodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/markdown/markdown';
-
 import { diff_match_patch } from 'diff-match-patch'
 
-import styles from '../styles/app.module.css'
-
 interface Props {
-    
+	
 }
 interface State {
-    text: string
+	text: string
 }
 
 export default class Editor extends Component<Props, State> {
-    pastEditorContent: string | undefined;
-    id: React.RefObject<HTMLInputElement>;
+	pastEditorContent: string | undefined;
+	id: React.RefObject<HTMLInputElement>;
 
 
-    constructor(props: Props) {
-        super(props)
-        this.state = {
-            text: ""
-        }
+	constructor(props: Props) {
+		super(props)
+		this.state = {
+			text: ""
+		}
 
-        this.id = React.createRef();
-    }
+		this.id = React.createRef();
+	}
 
-    componentDidMount() {
-        const options: RequestInit = {
-            method: 'POST',
-            headers: {
-                Authorization: Cookies.get('sesh')!,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: "id=619565bad3743043c4a57b18"
-        }
+	componentDidMount() {
+		const options: RequestInit = {
+			method: 'POST',
+			headers: {
+				Authorization: Cookies.get('sesh')!,
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			body: "id=619565bad3743043c4a57b18"
+		}
 
-        fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
-            d.text().then(e => {
-                this.pastEditorContent = e;
-                this.setState({ text: e });
-            })
-        })
-        this.pastEditorContent = this.state.text;
-        setInterval(() => {
-            if (this.state.text == this.pastEditorContent) {
-                return;
-            } else {
-                this.sendEdits();
-            }
-        }, 5000)
-    }
+		fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
+			d.text().then(e => {
+				this.pastEditorContent = e;
+				this.setState({ text: e });
+			})
+		})
+		this.pastEditorContent = this.state.text;
+		setInterval(() => {
+			if (this.state.text == this.pastEditorContent) {
+				return;
+			} else {
+				this.sendEdits();
+			}
+		}, 5000)
+	}
 
-    setId = () => {
-        const options: RequestInit = {
-            method: 'POST',
-            headers: {
-                Authorization: Cookies.get('sesh')!,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: "id="+this.id.current!.value
-        }
+	setId = () => {
+		const options: RequestInit = {
+			method: 'POST',
+			headers: {
+				Authorization: Cookies.get('sesh')!,
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			body: "id="+this.id.current!.value
+		}
 
-        fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
-            d.text().then(e => {
-                this.pastEditorContent = e;
-                this.setState({ text: e });
-            })
-        })
-    }
+		fetch("//api.noteer.local/api/v1/data/docs/get", options).then(d => {
+			d.text().then(e => {
+				this.pastEditorContent = e;
+				this.setState({ text: e });
+			})
+		})
+	}
 
-    sendEdits = () => {
-        let dmp = new diff_match_patch()
-        let prediff = dmp.diff_main(this.pastEditorContent!, this.state.text)
+	sendEdits = () => {
+		let dmp = new diff_match_patch()
+		let prediff = dmp.diff_main(this.pastEditorContent!, this.state.text)
 
-        let diff = dmp.patch_toText(dmp.patch_make(prediff))
+		let diff = dmp.patch_toText(dmp.patch_make(prediff))
 
-        const options: RequestInit = {
-            method: 'POST',
-            headers: {
-                Authorization: Cookies.get('sesh')!,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: "id=619565bad3743043c4a57b18&content="+encodeURIComponent(diff)
-        }
+		const options: RequestInit = {
+			method: 'POST',
+			headers: {
+				Authorization: Cookies.get('sesh')!,
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			body: "id=619565bad3743043c4a57b18&content="+encodeURIComponent(diff)
+		}
 
-        fetch("//api.noteer.local/api/v1/data/docs/edit", options).then(d => {
-            if (d.status == 200) {
-                this.pastEditorContent = this.state.text;
-            } else {
-                this.sendEdits();
-            }
-        })
-    }
+		fetch("//api.noteer.local/api/v1/data/docs/edit", options).then(d => {
+			if (d.status == 200) {
+				this.pastEditorContent = this.state.text;
+			} else {
+				this.sendEdits();
+			}
+		})
+	}
 
-    updateEditor = (e_: any, d_: any, newText: string) => {
-        this.setState({ text: newText });
-    }
+	updateEditor = (e_: any, d_: any, newText: string) => {
+		this.setState({ text: newText });
+	}
 
-    render() {
-        return (
-            <>
-                <Head>
-                    <title>Noteer - Editor</title>
-                </Head>
+	render() {
+		return (
+			<>
+				<Head>
+					<title>Noteer - Editor</title>
+				</Head>
 
-                <div className="content">
-                    <input type="text" name="id" id="id" ref={this.id} />
-                    <button onClick={this.setId}>Submit</button>
-                    <h1>Editor</h1>
-                    <CodeMirror value={this.state.text} onBeforeChange={(e,d,v) => {}} onChange={this.updateEditor} options={{lineNumbers: false, mode: "markdown", theme:"base16-light"}} />
-                    <button onClick={this.sendEdits}>submit changes</button>
-                </div>
-            </>
-        )
-    }
+				<div className="content">
+					<input type="text" name="id" id="id" ref={this.id} />
+					<button onClick={this.setId}>Submit</button>
+					<h1>Editor</h1>
+					
+					<button onClick={this.sendEdits}>submit changes</button>
+				</div>
+			</>
+		)
+	}
 }
