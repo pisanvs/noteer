@@ -194,3 +194,9 @@ body {
 
 	color: var(--m1) !important;
 }
+
+.editor {
+	display: inline-block;
+	height: 20vh !important;
+	width: 100% !important;
+}
