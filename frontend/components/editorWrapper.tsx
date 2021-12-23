@@ -24,12 +24,8 @@ import Head from "next/head";
 import React, { Component } from "react";
 
 import { diff_match_patch } from "diff-match-patch";
-import prism from "prismjs";
 
-prism.languages.extend(
-  "markdown",
-  require("prismjs/components/prism-markdown")
-);
+import Editor from './editor.jsx'
 
 interface Props {}
 interface State {
@@ -37,7 +33,7 @@ interface State {
   curPos: number;
 }
 
-export default class Editor extends Component<Props, State> {
+export default class EditorWrapper extends Component<Props, State> {
   pastEditorContent: string | undefined;
   id: React.RefObject<HTMLInputElement>;
   editor: React.RefObject<HTMLDivElement>;
@@ -124,14 +120,6 @@ export default class Editor extends Component<Props, State> {
 
   updateText = () => {
     this.setState({ text: this.editor.current?.innerHTML! });
-
-    if (this.editor.current) {
-      this.editor.current.innerHTML = prism.highlight(
-        this.editor.current?.innerText!,
-        prism.languages.markdown,
-        "markdown"
-      );
-    }
   };
 
   render() {
@@ -145,14 +133,7 @@ export default class Editor extends Component<Props, State> {
           <input type="text" name="id" id="id" ref={this.id} />
           <button onClick={this.setId}>Submit</button>
           <h1>Editor</h1>
-          <code
-            className="editor language-markdown"
-            contentEditable
-            ref={this.editor}
-            onInput={this.updateText}
-            onSelect={(e: React.SyntheticEvent<HTMLDivElement, Event>) => {}}
-          />
-		  <br /><br />
+          <Editor text={[{type: "paragraph", children: [{text: "Start Writing..."}]}]} />
           <button onClick={this.sendEdits}>submit changes</button>
         </div>
       </>

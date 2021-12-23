@@ -23,7 +23,7 @@ import React, { Component } from 'react'
 import '../../styles/app.module.css'
 import Router from 'next/router'
 import cookie from 'js-cookie'
-import Editor from '../../components/editor'
+import Editor from '../../components/editorWrapper'
 
 interface Props {
 	
