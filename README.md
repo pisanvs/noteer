@@ -1,3 +1,5 @@
+### ARCHIVED: I no longer have the time or motivation to continue this project, it was pretty ambicious from the start, but I might resume sometime
+
 # Noteer
 
 ok hi this is my new project...
